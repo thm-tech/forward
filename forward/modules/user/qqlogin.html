@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="http://www.immbear.com/bower_components/jquery/dist/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var URL = document.location.href;
+        var match = URL.match('access_token=\\w+');
+
+        if (match) {
+            var access_token = match[0].split('=')[1];
+            console.log(access_token);
+            $.get('http://api.immbear.com/userweb/qq/openid?access_token=' + access_token, function (data) {
+                var open_id = data.open_id;
+                var client_id = data.client_id;
+                $.get('http://api.immbear.com/userweb/qq/userinfo?access_token=' + access_token + '&openid=' + open_id, function (data) {
+                    console.log(data);
+                    var nickname = data.nickname;
+                    if (data.gender == '男') {
+                        var gender = 1;
+                    } else {
+                        var gender = 2;
+                    }
+                    var portraitUrl = data.figureurl_qq_2;
+                    console.log(access_token, open_id, nickname, gender, portraitUrl);
+                    location.href = 'http://www.immbear.com/#/customer/account/shops?'+'access_token=' + access_token + '&openid='+open_id+'&name=' + nickname + '&gender=' + String(gender) + '&portraitUrl=' + portraitUrl;
+                })
+            })
+        }
+    })
+</script>
+</body>
+</html>

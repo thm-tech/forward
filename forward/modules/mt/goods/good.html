@@ -1,0 +1,9 @@
+<h3>新品发布: {{ description }}</h3>
+{% if promotion_price %}
+<span>原价: <del>{{ price }}</del>, 促销价: </span><span>{{ promotion_price }}</span>
+{% else %}
+<span>价格: {{ price }} </span>
+{% end %}
+{% for img in imgs %}
+<img src="{{ img }}" style="max-width: 100%"/>
+{% end %}
