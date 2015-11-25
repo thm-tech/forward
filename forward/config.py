@@ -41,17 +41,9 @@ CONFIG.MYSQL = ndict()
 CONFIG.MYSQL.PORT = 3306
 CONFIG.MYSQL.HOST = '115.28.143.67'
 CONFIG.MYSQL.USER = 'fd'
-CONFIG.MYSQL.PASSWD = '111111'
+CONFIG.MYSQL.PASSWD = 'poweroverming'
 CONFIG.MYSQL.DATABASE = 'fddb'
-"""
-DB_BASE = {
-    'HOST': conf.get('MYSQL', 'HOST'),
-    'PORT': conf.getint('MYSQL', 'PORT'),
-    'USER': conf.get('MYSQL', 'USER'),
-    'PASSWORD': conf.get('MYSQL', 'PASSWD'),
-    'DATABASE': 'fddb',
-}
-"""
+
 CONFIG.SQLALCHEMY = ndict()
 CONFIG.SQLALCHEMY.URL = 'mysql://%s:%s@%s:%s/fddb?charset=utf8' % (
     CONFIG.MYSQL.USER, CONFIG.MYSQL.PASSWD, CONFIG.MYSQL.HOST, CONFIG.MYSQL.PORT)

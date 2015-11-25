@@ -211,10 +211,16 @@ def select_phone_type_list(phone, phone_list):
         return_info['notplatform'] = [i for i in phone_list if i not in platform_phone_list]
 
         user_id = dbsession.query(FD_T_User.user_id).filter(FD_T_User.phone_no == phone)[0]
-        platform_friend_list = dbsession.query(FD_T_User.phone_no).outerjoin(FD_T_Friend,
-                                                                             FD_T_User.user_id == FD_T_Friend.friend_id).filter(
-            FD_T_User.phone_no.in_(platform_phone_list)).filter(FD_T_Friend.user_id == user_id).all()
-        platform_friend_list = [str(i[0]) for i in platform_friend_list]
+
+        friend_list = dbsession.query(FD_T_Friend.friend_id).filter(FD_T_Friend.user_id == user_id).all()
+        friend_list = [str(i[0]) for i in friend_list]
+
+        platform_friend_list = [i for i in friend_list if i in platform_phone_list]
+        
+        # platform_friend_list = dbsession.query(FD_T_User.phone_no).outerjoin(FD_T_Friend,
+        # FD_T_User.user_id == FD_T_Friend.friend_id).filter(
+        #     FD_T_User.phone_no.in_(platform_phone_list)).filter(FD_T_Friend.user_id == user_id).all()
+        # platform_friend_list = [str(i[0]) for i in platform_friend_list]
         return_info['platform_friend'] = platform_friend_list
 
         return_info['platform_notfriend'] = [str(i) for i in platform_phone_list if i not in platform_friend_list]
