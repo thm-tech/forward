@@ -19,6 +19,7 @@ from forward.config import CONFIG
 from forward.modules.user.db_passport import DBPassport
 from forward.httpbase import HttpBaseHandler
 
+
 __author__ = 'Mohanson'
 
 urls = []
@@ -246,3 +247,10 @@ class SendInviteHandler2(HttpBaseHandler):
 class AccountHandler(HttpBaseHandler):
     def get(self, id):
         self.write(get_account_info(id))
+
+
+@tornado_route(r'/user/(\d+)/info', urls)
+class UserInfoScanHandler(HttpBaseHandler):
+    def get(self, user_id):
+        uids = self.get_arguments('uid')
+        self.write(get_user_info_and_relationship(user_id, uids))

@@ -1,16 +1,14 @@
 # -*- encoding: utf-8 -*-
-from forward.modules.user.handler_shopping import dao
-
-__author__ = 'Mohanson'
+import sys
 
 from xpinyin import Pinyin
 
+from forward.modules.user.handler_shopping import dao
 from forward.common.tools import piclist_to_fulllist
 from forward.modules.mt.shop.db_shop import *
 from forward.common.define import OSS_URL_PRIFIX
 from forward.modules.user.error import FD_USER_NOERR
 from forward.config import CONFIG
-import sys
 
 
 def get_account_info(id):
@@ -210,16 +208,18 @@ def select_phone_type_list(phone, phone_list):
         platform_phone_list = [str(i[0]) for i in platform_phone_list]
         return_info['notplatform'] = [i for i in phone_list if i not in platform_phone_list]
 
-        user_id = dbsession.query(FD_T_User.user_id).filter(FD_T_User.phone_no == phone)[0]
+        user_id = dbsession.query(FD_T_User.user_id).filter(FD_T_User.phone_no == phone).one()[0]
 
         friend_list = dbsession.query(FD_T_Friend.friend_id).filter(FD_T_Friend.user_id == user_id).all()
         friend_list = [str(i[0]) for i in friend_list]
+        friend_list = dbsession.query(FD_T_User.phone_no).filter(FD_T_User.user_id.in_(friend_list)).all()
+        friend_list = [str(i[0]) for i in friend_list]
 
         platform_friend_list = [i for i in friend_list if i in platform_phone_list]
-        
+
         # platform_friend_list = dbsession.query(FD_T_User.phone_no).outerjoin(FD_T_Friend,
         # FD_T_User.user_id == FD_T_Friend.friend_id).filter(
-        #     FD_T_User.phone_no.in_(platform_phone_list)).filter(FD_T_Friend.user_id == user_id).all()
+        # FD_T_User.phone_no.in_(platform_phone_list)).filter(FD_T_Friend.user_id == user_id).all()
         # platform_friend_list = [str(i[0]) for i in platform_friend_list]
         return_info['platform_friend'] = platform_friend_list
 
@@ -233,5 +233,87 @@ def select_phone_type_list(phone, phone_list):
         return return_info
 
 
+def get_user_info_and_relationship(user_id, aim_id_list):
+    dbsession = DBSession()
+    return_info = {'issuccess': True, 'users': []}
+    user_info = {
+        'userId': None,
+        'userName': None,
+        'userImgUrl': None,
+        'gender': 0,
+        'mcode': None,
+        'phoneNo': None,
+        'cityId': None,
+        'cityName': None,
+        'userType': None,
+
+        'isMyFriend': False,
+        'remark': None
+    }
+    for id in aim_id_list:
+        uinfo = {}
+        try:
+            type = dbsession.query(FD_T_Account.acc_type).filter(FD_T_Account.acc_id == id).one()[0]
+        except NoResultFound:
+            break
+        else:
+            if type == 4:
+                type = 1
+            elif type == 5:
+                type = 2
+            else:
+                type = 0
+            uinfo['userType'] = type
+        if type == 1:
+            try:
+                user = dbsession \
+                    .query(FD_T_User.user_id, FD_T_User.name, FD_T_User.portrait_url,
+                           FD_T_User.gender, FD_T_User.mcode, FD_T_User.phone_no, FD_T_User.city_id,
+                           FD_T_Citycode.city_name
+                           ).distinct() \
+                    .outerjoin(FD_T_Citycode, FD_T_Citycode.city_id == FD_T_User.city_id) \
+                    .filter(FD_T_User.user_id == id).one()
+            except NoResultFound:
+                break
+            else:
+                uinfo['userId'] = user[0]
+                uinfo['userName'] = user[1]
+                uinfo['userImgUrl'] = piclist_to_fulllist(user[2])[0]
+                uinfo['gender'] = user[3]
+                uinfo['mcode'] = user[4]
+                uinfo['phoneNo'] = user[5]
+                uinfo['cityId'] = user[6]
+                uinfo['cityName'] = user[7]
+                try:
+                    finfo = dbsession.query(FD_T_Friend.friend_name).filter(FD_T_Friend.user_id == user_id,
+                                                                            FD_T_Friend.friend_id == id).one()
+                except NoResultFound:
+                    uinfo['isMyFriend'] = False
+                else:
+                    uinfo['isMyFriend'] = True
+                    uinfo['remark'] = finfo[0]
+        elif type == 2:
+            shangjia = dbsession.query(FD_T_Shopaccount.shop_id, FD_T_Shopaccount.contact_name,
+                                       FD_T_Shopaccount.portrait_url, FD_T_Shopaccount.contact_phone_no,
+                                       FD_T_Citycode.city_id, FD_T_Citycode.city_name).distinct() \
+                .outerjoin(FD_T_Shop, FD_T_Shopaccount.shop_id == FD_T_Shop.shop_id) \
+                .outerjoin(FD_T_Citycode, FD_T_Shop.city_id == FD_T_Citycode.city_id) \
+                .filter(FD_T_Shopaccount.shop_id == id).one()
+            uinfo['userId'] = shangjia[0]
+            uinfo['userName'] = shangjia[1]
+            uinfo['userImgUrl'] = piclist_to_fulllist(shangjia[2])[0]
+            uinfo['gender'] = 0
+            uinfo['mcode'] = None
+            uinfo['phoneNo'] = shangjia[3]
+            uinfo['cityId'] = shangjia[4]
+            uinfo['cityName'] = shangjia[5]
+        else:
+            pass
+
+        return_info['users'].append(uinfo)
+
+    return return_info
+
+
 if __name__ == '__main__':
-    pass
+    get_user_info_and_relationship(10247, [10010, 10011, 10042])

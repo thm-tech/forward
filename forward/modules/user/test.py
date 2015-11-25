@@ -10,8 +10,8 @@ FORWARD_URL = 'http://127.0.0.1:7188'
 FORWARD_URL = 'http://127.0.0.1:8888'
 session = requests.session()
 
-class Passport(unittest.TestCase):
 
+class Passport(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -27,11 +27,11 @@ class Passport(unittest.TestCase):
     def test_2_login_exist(self):
         print "\n----------test_2_login_exist----------"
         data = '{"mode":2, "phone":"15812345677", "password":"111222", "dev":"IMEI123456"}'
-        print "req cookie:",session.cookies
+        print "req cookie:", session.cookies
         response = session.post(FORWARD_URL + '/user/login', data=data)
-        print "rep cookie:",session.cookies
+        print "rep cookie:", session.cookies
         print(response.text)
-    
+
     def test_3_logout(self):
         print "\n----------test_3_logout----------"
         data = '{}'
@@ -41,19 +41,19 @@ class Passport(unittest.TestCase):
     def test_4_login_unexist(self):
         print "\n-----test_4_login_unexist----------"
         data = '{"mode":2, "phone":"15812347777", "password":"123456", "dev":"IMEI123456"}'
-        print "req cookie:",session.cookies
+        print "req cookie:", session.cookies
         response = session.post(FORWARD_URL + '/user/login', data=data)
-        print "rep cookie:",session.cookies
+        print "rep cookie:", session.cookies
         print(response.text)
 
     def test_5_login_3rd_exist(self):
         print "\n-----test_5_login_3rd_exist----------"
         data = '{"mode":4, "openID":"qq123456789abcd", "dev":"IMEI123456"}'
-        print "req cookie:",session.cookies
+        print "req cookie:", session.cookies
         response = session.post(FORWARD_URL + '/user/loginex', data=data)
-        print "rep cookie:",session.cookies
+        print "rep cookie:", session.cookies
         print(response.text)
-    
+
     def test_6_generate_phone_verify_code(self):
         print "\n-----test_6_generate_phone_verify_code----------"
         data = '{"phone":"15855193773"}'
@@ -72,6 +72,7 @@ class Passport(unittest.TestCase):
         response = session.post(FORWARD_URL + '/user/resetpw', data=data)
         print(response.text)
 
+
 class Personal(unittest.TestCase):
     def setUp(self):
         pass
@@ -83,7 +84,7 @@ class Personal(unittest.TestCase):
         print "\n-----test_1_query_personal_info----------"
         response = session.get(FORWARD_URL + '/user/info')
         print(response.text)
-    
+
     def test_2_modify_personal_info_name(self):
         print "\n-----test_2_modify_personal_info_name----------"
         data = '{"attr":1, "name":"mmxu1"}'
@@ -131,6 +132,7 @@ class Personal(unittest.TestCase):
         response = session.delete(FORWARD_URL + '/user/address', data=data)
         print(response.text)
 
+
 class Shopping(unittest.TestCase):
     def setUp(self):
         pass
@@ -147,12 +149,12 @@ class Shopping(unittest.TestCase):
         print "\n-----test_2_query_shops_by_categorys----------"
         response = session.get(FORWARD_URL + '/user/shop?category=123&city=1&long=123.45&lat=35.55&offset=0&count=5')
         print(response.text)
-    
+
     def test_3_query_shop_name(self):
         print "\n-----test_3_query_shop_name----------"
         response = session.get(FORWARD_URL + '/user/shop/name?sid=10061')
         print(response.text)
-    
+
     def test_4_visit_shop(self):
         print "\n-----test_4_visit_shop----------"
         response = session.post(FORWARD_URL + '/user/shop/enter?sid=10061')
@@ -201,8 +203,10 @@ class Shopping(unittest.TestCase):
     def test_13_search_shops_by_name(self):
         print "\n-----test_13_search_shops_by_name----------"
         HS = u'黄山'
-        response = session.get(FORWARD_URL + '/user/shop/search?name=' + HS + '&city=1048577&long=123.45&lat=35.55&offset=0&count=5')
+        response = session.get(
+            FORWARD_URL + '/user/shop/search?name=' + HS + '&city=1048577&long=123.45&lat=35.55&offset=0&count=5')
         print(response.text)
+
 
 class Friend(unittest.TestCase):
     def setUp(self):
@@ -264,6 +268,7 @@ class Friend(unittest.TestCase):
         response = session.get(FORWARD_URL + '/user/info?uid=10040')
         print(response.text)
 
+
 class Fans(unittest.TestCase):
     def setUp(self):
         pass
@@ -276,7 +281,7 @@ class Fans(unittest.TestCase):
         data = '{"shopIDs":[10023,10024,10060]}'
         response = session.post(FORWARD_URL + '/user/fans/diff', data=data)
         print(response.text)
-    
+
     def test_2_query_fans_shop_info(self):
         print "\n----test_2_query_fans_shop_info---------"
         response = session.get(FORWARD_URL + '/user/fans/info?sid=10061&sid=10123')
@@ -297,13 +302,14 @@ class Fans(unittest.TestCase):
         response = session.delete(FORWARD_URL + '/user/shop/concern?sid=10060')
         print(response.text)
 
+
 class Favorite(unittest.TestCase):
     def setUp(self):
         pass
 
     def tearDown(self):
         session.close()
-    
+
     def test_1_query_favorite_difference(self):
         print "\n----test_1_query_favorite_difference---------"
         data = '{"goodsIDs":[1,3,5]}'
@@ -330,6 +336,7 @@ class Favorite(unittest.TestCase):
         response = session.get(FORWARD_URL + '/user/goods/promot?gid=1&gid=2')
         print(response.text)
 
+
 class Setting(unittest.TestCase):
     def setUp(self):
         pass
@@ -341,7 +348,7 @@ class Setting(unittest.TestCase):
         print "\n----test_1_query_support_city---------"
         response = session.get(FORWARD_URL + '/user/city')
         print(response.text)
-    
+
     def test_2_query_private_setting(self):
         print "\n----test_2_query_private_setting---------"
         response = session.get(FORWARD_URL + '/user/setting/private')
@@ -372,19 +379,49 @@ class Setting(unittest.TestCase):
 
     def test_7(self):
         import requests
-        r = requests.get('http://localhost:8887/user/shop/search', params={
-            'name': '',
-            'long': 2,
-            'lat': 2,
-            'offset': 0,
-            'count': 100,
-            'city': 1048577,
-        })
         import json
-        r = json.loads(r.text)
-        print(r)
-        for i in r['shopList']:
-            print(i['picList'])
+
+        r = requests.post('http://api.immbear.com/userweb/selectphones', data=json.dumps({
+            'phone': '15156007002',
+            "phone_list": (
+                "130-7552-8507",
+                "185-5539-2589",
+                "183-5653-7683",
+                "151-9021-5387",
+                "186-5411-8731",
+                "137-2102-2289",
+                "136-7159-9323",
+                "138-0560-6662",
+                "153-3960-5410",
+                "158-5519-3773",
+                "136-6551-9124",
+                "138-6595-2495",
+                "183-0519-2610",
+                "131-2221-1228",
+                "153-9191-5027",
+                "187-5645-2691",
+                "+86 181-1098-3681",
+                "137-2107-2230",
+                "13728859434",
+                "139-5607-1245",
+                "155-5510-4851",
+                "186-5411-8282",
+                "189-6919-8457",
+                "177-3003-6459",
+                "155-0551-7718",
+                "151-5519-5957",
+                "180-5711-7859",
+                "152-1277-2515",
+                "159-2244-0932",
+                "136-9569-6203",
+                "183-2631-7870",
+                "15212297105",
+                "152-0569-5836"
+            )
+        }))
+        print(r.text)
+        print(json.loads(r.text)['platform_friend'])
+
 
 if __name__ == '__main__':
     unittest.main()
