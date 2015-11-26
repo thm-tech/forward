@@ -11,7 +11,7 @@ def md5(bytes):
     return hashlib.md5(bytes).hexdigest()
 
 
-pool = redis.ConnectionPool(host=CONFIG.REDIS.HOST, port=6379, db=0)
+pool = redis.ConnectionPool(host=CONFIG.REDIS.HOST, port=6379, db=0, password=CONFIG.REDIS.PASSWORD)
 session = redis.StrictRedis(connection_pool=pool)
 
 
