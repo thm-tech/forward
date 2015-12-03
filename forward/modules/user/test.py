@@ -7,7 +7,7 @@ import requests
 
 
 FORWARD_URL = 'http://127.0.0.1:7188'
-FORWARD_URL = 'http://127.0.0.1:8888'
+FORWARD_URL = 'http://127.0.0.1:8887'
 session = requests.session()
 
 
@@ -381,46 +381,9 @@ class Setting(unittest.TestCase):
         import requests
         import json
 
-        r = requests.post('http://api.immbear.com/userweb/selectphones', data=json.dumps({
-            'phone': '15156007002',
-            "phone_list": (
-                "130-7552-8507",
-                "185-5539-2589",
-                "183-5653-7683",
-                "151-9021-5387",
-                "186-5411-8731",
-                "137-2102-2289",
-                "136-7159-9323",
-                "138-0560-6662",
-                "153-3960-5410",
-                "158-5519-3773",
-                "136-6551-9124",
-                "138-6595-2495",
-                "183-0519-2610",
-                "131-2221-1228",
-                "153-9191-5027",
-                "187-5645-2691",
-                "+86 181-1098-3681",
-                "137-2107-2230",
-                "13728859434",
-                "139-5607-1245",
-                "155-5510-4851",
-                "186-5411-8282",
-                "189-6919-8457",
-                "177-3003-6459",
-                "155-0551-7718",
-                "151-5519-5957",
-                "180-5711-7859",
-                "152-1277-2515",
-                "159-2244-0932",
-                "136-9569-6203",
-                "183-2631-7870",
-                "15212297105",
-                "152-0569-5836"
-            )
-        }))
-        print(r.text)
-        print(json.loads(r.text)['platform_friend'])
+        data = '{"mode":2, "phone":"18756967287", "password":"111111", "dev":"IMEI123456"}'
+        response = session.post(FORWARD_URL + '/user/login', data=data)
+        print(response)
 
 
 if __name__ == '__main__':

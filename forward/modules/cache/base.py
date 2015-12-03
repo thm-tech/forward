@@ -45,4 +45,4 @@ def clear_all():
     for i in session.keys('cache_*'):
         session.delete(i)
 
-clear_all()
+# clear_all()

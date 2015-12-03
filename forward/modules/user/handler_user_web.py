@@ -18,7 +18,8 @@ from forward.common.define import OSS_URL_PRIFIX
 from forward.config import CONFIG
 from forward.modules.user.db_passport import DBPassport
 from forward.httpbase import HttpBaseHandler
-
+from tornado.web import authenticated
+from forward.modules.user.db_friend import DBFriend
 
 __author__ = 'Mohanson'
 
@@ -232,6 +233,7 @@ class SendInviteHandler(HttpBaseHandler):
 @tornado_route(r'/userweb/sendinvite2', urls)
 class SendInviteHandler2(HttpBaseHandler):
     # 对方手机号码, remark=对
+
     @tornado_argument_json('_phone', 'name', 'remark')
     def post(self):
         password = str(int(random.random() * 1000)) + '000'
@@ -254,3 +256,15 @@ class UserInfoScanHandler(HttpBaseHandler):
     def get(self, user_id):
         uids = self.get_arguments('uid')
         self.write(get_user_info_and_relationship(user_id, uids))
+
+
+@tornado_route(r'/user/friend/delete', urls)
+class UserFriendDeleteHandler(HttpBaseHandler):
+    @authenticated
+    @tornado_argument('_uid')
+    def delete(self):
+        user_id = self.get_current_user()
+        resposne = DBFriend().deleteFriendship(user_id, self.arg.uid)
+        self.write({
+            'is_success': resposne
+        })

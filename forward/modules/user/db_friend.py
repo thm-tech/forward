@@ -273,8 +273,6 @@ class DBFriend(object):
             sql = "select user_id from fd_t_user where phone_no = %s"
             paras = (phone_no,)
 
-            cursor.execute(sql, paras)
-
             row_count = cursor.execute(sql, paras)
             if row_count <= 0:
                 user_log.error("No user info by phone no. Phone no: %s", phone_no)
@@ -301,21 +299,21 @@ class DBFriend(object):
         try:
             ffv_count = {}
 
-            #query user fans shop count
+            # query user fans shop count
             sql = "select count(0) as count from fd_t_fans where user_id = %s"
             paras = (user_id,)
             cursor.execute(sql, paras)
             row = cursor.fetchone()
             ffv_count["fans"] = row["count"]
 
-            #query user favorite goods count
+            # query user favorite goods count
             sql = "select count(0) as count from fd_t_favorite where user_id = %s"
             paras = (user_id,)
             cursor.execute(sql, paras)
             row = cursor.fetchone()
             ffv_count["favorite"] = row["count"]
 
-            #query user fans shop count
+            # query user fans shop count
             sql = "select count(0) as count from fd_t_visitedshop where user_id = %s"
             paras = (user_id,)
             cursor.execute(sql, paras)
@@ -333,3 +331,17 @@ class DBFriend(object):
             cursor.close()
             conn.close()
 
+    def deleteFriendship(self, uid, fid):
+        conn = self._pool.connection()
+        cursor = conn.cursor()
+        sql = "DELETE FROM fd_t_friend WHERE user_id = %s AND friend_id = %s OR user_id = %s AND friend_id = %s"
+        params = (uid, fid, fid, uid)
+        try:
+            row_count = cursor.execute(sql, params)
+            return True
+        except Exception:
+            return False
+
+if __name__ == '__main__':
+    a = DBFriend().deleteFriendship(10001, 10003)
+    print(a)

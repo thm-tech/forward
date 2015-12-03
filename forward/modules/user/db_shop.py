@@ -13,6 +13,7 @@ from forward.common import trans
 from forward.common.tools import piclist_to_fulllist
 from forward.log import user_log
 
+
 class DBShop(object):
     _pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=100, host=CONFIG.MYSQL.HOST, port=CONFIG.MYSQL.PORT,
                      user=CONFIG.MYSQL.USER, passwd=CONFIG.MYSQL.PASSWD, db=CONFIG.MYSQL.DATABASE,
@@ -443,7 +444,6 @@ class DBShop(object):
         conn.close()
         return row_count
 
-
     def queryShopInfo(self, shop_id):
         conn = self._pool.connection()
         cursor = conn.cursor()
@@ -614,7 +614,7 @@ class DBShop(object):
                 user_log.error("Not friend!")
                 return None
 
-            sql = "select t1.goods_id, t2.description, t2.price, t2.promotion_price, t2.pic_url_list \
+            sql = "select t1.goods_id, t2.shop_id, t2.description, t2.price, t2.promotion_price, t2.pic_url_list \
                     from fd_t_favorite t1, fd_t_goods t2 where user_id = %s and t1.goods_id = t2.goods_id and t1.save_time <= \
                     (select t3.save_time from fd_t_favorite t3 where t3.user_id = %s order by t3.save_time desc limit %s,1) \
                     order by t1.save_time desc limit %s"
@@ -629,6 +629,7 @@ class DBShop(object):
             for row in rows:
                 goods = {}
                 goods["id"] = row["goods_id"]
+                goods["shop_id"] = row["shop_id"]
                 goods["desc"] = row["description"]
                 goods["price"] = row["price"]
                 goods["promot"] = row["promotion_price"]
@@ -1009,11 +1010,13 @@ class DBShop(object):
                 save_time = datetime.now()
                 sql = "insert into fd_t_favorite values (%s, %s, %s)"
                 paras = (user_id, goods_id, save_time)
-                cursor.execute('update fd_t_goodsinfo set attention_count = attention_count + 1 where goods_id = %s', (goods_id, ))
+                cursor.execute('update fd_t_goodsinfo set attention_count = attention_count + 1 where goods_id = %s',
+                               (goods_id, ))
             else:
                 sql = "delete from fd_t_favorite where user_id = %s and goods_id = %s"
                 paras = (user_id, goods_id)
-                cursor.execute('update fd_t_goodsinfo set attention_count = attention_count - 1 where goods_id = %s', (goods_id, ))
+                cursor.execute('update fd_t_goodsinfo set attention_count = attention_count - 1 where goods_id = %s',
+                               (goods_id, ))
 
             cursor.execute(sql, paras)
 
