@@ -10,7 +10,6 @@ from forward.log import user_log
 from forward.common.tools import native_str2
 
 
-
 class DBPersonal(object):
     _pool = PooledDB(creator=MySQLdb, mincached=1, maxcached=100, host=CONFIG.MYSQL.HOST, port=CONFIG.MYSQL.PORT,
                      user=CONFIG.MYSQL.USER, passwd=CONFIG.MYSQL.PASSWD, db=CONFIG.MYSQL.DATABASE,
@@ -227,7 +226,7 @@ class DBPersonal(object):
                 default = 0
 
             sql = "insert into fd_t_useraddress values(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            paras = (addr_id, user_id, name, phone, city_id, province_id, address, postcode, default)
+            paras = (addr_id, user_id, name, phone, province_id, city_id, address, postcode, default)
 
             row_count = cursor.execute(sql, paras)
             if row_count <= 0:
@@ -287,7 +286,7 @@ class DBPersonal(object):
 
             row_count = cursor.execute(sql, paras)
             # if row_count <= 0:
-            #     LOGGER.error("Bind phone no failed! Update account data failed! Phone no: %s", phone)
+            # LOGGER.error("Bind phone no failed! Update account data failed! Phone no: %s", phone)
             #     conn.rollback()
             #     return False
 

@@ -380,10 +380,12 @@ class Setting(unittest.TestCase):
     def test_7(self):
         import requests
         import json
-
-        data = '{"mode":2, "phone":"18756967287", "password":"111111", "dev":"IMEI123456"}'
-        response = session.post(FORWARD_URL + '/user/login', data=data)
-        print(response)
+        session = requests.session()
+        data = '{"mode":2, "phone":"18756967287", "password":"96e79218965eb72c92a549dd5a330112", "dev":"IMEI123456", "type":4}'
+        response = session.post('http://localhost:8887/user/login', data=data)
+        print(response.text)
+        response = session.delete('http://localhost:8887/user/friend/delete', params={'uid': 10003})
+        print(response.text)
 
 
 if __name__ == '__main__':

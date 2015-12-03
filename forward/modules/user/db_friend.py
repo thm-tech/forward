@@ -338,9 +338,15 @@ class DBFriend(object):
         params = (uid, fid, fid, uid)
         try:
             row_count = cursor.execute(sql, params)
+            cursor.close()
+            conn.commit()
+            conn.close()
             return True
-        except Exception:
+        except:
+            cursor.close()
+            conn.close()
             return False
+
 
 if __name__ == '__main__':
     a = DBFriend().deleteFriendship(10001, 10003)
