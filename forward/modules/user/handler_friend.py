@@ -12,6 +12,7 @@ from forward.common.send_message import send_invite_friend_download_app
 from forward.modules.user.db_friend import *
 from forward.log import user_log
 from forward.config import CONFIG
+
 dao_friend = DBFriend()
 dao_shop = DBShop()
 
@@ -93,6 +94,23 @@ class QueryFriendInfoHandler(HttpBaseHandler):
         self.set_header("Content-type", "application/json")
         self.write(json.dumps(rep_json, cls=ExtendedJsonEncoder))
         return
+
+    @authenticated
+    def delete(self):
+        frd_id_list = self.get_arguments("uid")
+        if not frd_id_list:
+            user_log.error("Query friend info list protocol data error!")
+            rep_json = {}
+            rep_json["err"] = FD_ERR_USER_PROTOCOL_DATA_ERROR
+            self.set_header("Content-type", "application/json")
+            self.write(json.dumps(rep_json, cls=ExtendedJsonEncoder))
+            return
+
+        user_id = self.get_current_user()
+        return_dict = {'is_success': True}
+        for fid in frd_id_list:
+            result = dao_friend.deleteFriendship(user_id, fid)
+        self.write(return_dict)
 
 
 class ModifyFriendRemarkNameHandler(HttpBaseHandler):
@@ -293,7 +311,6 @@ class InviteFriendAddingHandler(HttpBaseHandler):
         user_id = req_json["userID"]
         remark = req_json["remark"]
 
-
         cur_user_id = self.get_current_user()
         user_info = dao_friend.queryUserInfo(cur_user_id)
         if user_info is None:
@@ -316,7 +333,8 @@ class InviteFriendAddingHandler(HttpBaseHandler):
                     self.write(json.dumps(rep_json, cls=ExtendedJsonEncoder))
                     return
                 else:
-                    r = send_invite_friend_download_app(phone_no, user_info['name'], remark.encode('utf-8'), 'www.immbear.com')
+                    r = send_invite_friend_download_app(phone_no, user_info['name'], remark.encode('utf-8'),
+                                                        'www.immbear.com')
                     r = json.loads(r)
                     if r['code'] != 0:
                         user_log.error("Send Message Failed! User id: %s, phone: %s" % (cur_user_id, phone_no))
@@ -352,7 +370,7 @@ class InviteFriendAddingHandler(HttpBaseHandler):
                 return
             else:
                 user_log.error("Send inviting be friend message failed! Invitor id: %s, receivor id: %s", cur_user_id,
-                             user_id)
+                               user_id)
                 rep_json = {}
                 rep_json["err"] = FD_ERR_USER_SEND_INVITING_BE_FRIEND_MESSAGE_FAILED
                 self.set_header("Content-type", "application/json")
